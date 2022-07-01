@@ -1,8 +1,7 @@
 package com.wangguangwu.executor.rejectedExecutionHandler;
 
-import com.wangguangwu.cpuntdownlatchdemo.MyArrayList;
-import com.wangguangwu.cpuntdownlatchdemo.MyArrayList4;
-import org.junit.Assert;
+import com.wangguangwu.countdownlatchdemo.MyArrayList;
+import com.wangguangwu.countdownlatchdemo.MyArrayList4;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
 
