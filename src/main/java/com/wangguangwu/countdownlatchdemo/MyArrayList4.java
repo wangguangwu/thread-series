@@ -1,4 +1,4 @@
-package com.wangguangwu.cpuntdownlatchdemo;
+package com.wangguangwu.countdownlatchdemo;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
