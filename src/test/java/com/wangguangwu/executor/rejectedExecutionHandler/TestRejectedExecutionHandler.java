@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author wangguangwu
  */
 @Slf4j
-public class ApiTest {
+public class TestRejectedExecutionHandler {
 
     private static ThreadPoolExecutor executor;
 
