@@ -3,6 +3,7 @@ package com.wangguangwu.executor.rejectedExecutionHandler;
 import com.wangguangwu.countdownlatchdemo.MyArrayList;
 import com.wangguangwu.countdownlatchdemo.MyArrayList4;
 import org.junit.Test;
+import org.slf4j.helpers.MessageFormatter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,22 +46,30 @@ public class TestConcurrentList {
     public void testMyArrayList() throws InterruptedException {
 
         MyArrayList<Integer> list = new MyArrayList<>();
-        CountDownLatch countDownLatch = new CountDownLatch(2);
 
+        int num = 10;
         // 开启两个线程，各插入 1000 条数据
-        Runnable runnable = (() -> {
-            for (int i = 0; i < 100000; i++) {
+        Runnable runnable = () -> {
+            for (int i = 0; i < num; i++) {
                 list.add(i);
             }
-            countDownLatch.countDown();
-        });
+        };
 
-        for (int i = 0; i < 2; i++) {
-            new Thread(runnable).start();
+        ArrayList<Thread> threads = new ArrayList<>();
+
+        int threadNum = 2;
+        for (int i = 0; i < threadNum; i++) {
+            Thread thread = new Thread(runnable);
+            threads.add(thread);
+            thread.start();
         }
 
-        countDownLatch.await();
-        System.out.println("size: " + list.size());
+        for (Thread thread : threads) {
+            thread.join();
+        }
+
+        String message = MessageFormatter.format("expect: [{}}, real: [{}]", threadNum * num, list.size()).getMessage();
+        System.out.println(message);
     }
 
     @Test
