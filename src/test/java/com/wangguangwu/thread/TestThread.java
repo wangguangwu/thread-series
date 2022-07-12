@@ -1,7 +1,9 @@
 package com.wangguangwu.thread;
 
+import com.wangguangwu.mythread.WaitAndNotify;
 import org.junit.Test;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -11,6 +13,21 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TestThread {
 
+    // test printNUm
+    @Test
+    public void testWaitAndNotify() throws InterruptedException {
+        CountDownLatch countDownLatch = new CountDownLatch(2);
+        Object lock = new Object();
+        Thread thread1 = new Thread(new WaitAndNotify(true, lock, 1, countDownLatch));
+        Thread thread2 = new Thread(new WaitAndNotify(false, lock, 2, countDownLatch));
+        // t2 先运行，先进入等待状态
+        thread2.start();
+        // t1 直接运行，唤醒 t2 后进入等待
+        thread1.start();
+        // junit 单元测试不支持多线程
+        countDownLatch.await();
+        System.out.println("执行结束");
+    }
 
 
 
@@ -40,7 +57,6 @@ public class TestThread {
                 threadNo.set(1);
             }
         }).start();
-
     }
 
 }
