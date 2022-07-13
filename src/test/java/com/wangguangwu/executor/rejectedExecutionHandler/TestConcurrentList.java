@@ -1,16 +1,14 @@
 package com.wangguangwu.executor.rejectedExecutionHandler;
 
-import com.wangguangwu.countdownlatchdemo.MyArrayList;
 import com.wangguangwu.countdownlatchdemo.MyArrayList4;
 import org.junit.Test;
 import org.slf4j.helpers.MessageFormatter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;
 
@@ -40,6 +38,94 @@ public class TestConcurrentList {
 
         countDownLatch.await();
         System.out.println("size: " + list.size());
+    }
+
+    @Test
+    public void testNull() throws InterruptedException {
+        MyArrayList<Integer> list = new MyArrayList<>();
+
+        CountDownLatch countDownLatch = new CountDownLatch(2);
+
+        // 开启两个线程，每个线程插入 1000 次
+        Runnable runnable = () -> {
+            for (int i = 0; i < 1000; i++) {
+                list.add(i);
+            }
+            countDownLatch.countDown();
+        };
+
+        for (int i = 0; i < 2; i++) {
+            new Thread(runnable).start();
+        }
+
+        countDownLatch.await();
+        System.out.println("size: " + list.size());
+
+//        list.forEach(System.out::println);
+
+        AtomicInteger nullCount = new AtomicInteger();
+        Set<Integer> set = new HashSet<>();
+
+
+        list.forEach(a -> {
+            if (a == null) {
+                nullCount.getAndIncrement();
+            }
+            if (!set.contains(a) && a != null) {
+                set.add(a);
+            }
+        });
+        System.out.println(nullCount);
+        System.out.println(set.size());
+    }
+
+    /**
+     * @author wangguangwu
+     */
+    static class MyArrayList<E> {
+
+        protected transient int modCount = 0;
+
+        /**
+         * 维护一个数组
+         */
+        Object[] elementData;
+
+        /**
+         * 使用线程安全的变量进行计算
+         */
+        private final AtomicInteger size;
+
+        public MyArrayList() {
+            // 直接给 1000000 的容量，免去扩容机制
+            this.elementData = new Object[1000000];
+            size = new AtomicInteger(0);
+        }
+
+        public boolean add(E e) {
+            int i = size.get();
+            elementData[i] = e;
+            modCount++;
+            size.incrementAndGet();
+            return true;
+        }
+
+        public int size() {
+            return size.get();
+        }
+
+        public void forEach(Consumer<? super E> action) {
+            Objects.requireNonNull(action);
+            final int expectedModCount = modCount;
+            @SuppressWarnings("unchecked") final E[] elementData = (E[]) this.elementData;
+            final int size = this.size.get();
+            for (int i = 0; modCount == expectedModCount && i < size; i++) {
+                action.accept(elementData[i]);
+            }
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException();
+            }
+        }
     }
 
     @Test

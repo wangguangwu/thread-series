@@ -29,9 +29,6 @@ public class TestThread {
         System.out.println("执行结束");
     }
 
-
-
-
     //===============================================================
 
     private final AtomicInteger threadNo = new AtomicInteger(1);
